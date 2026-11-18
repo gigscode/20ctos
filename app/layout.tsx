@@ -4,11 +4,11 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: "20 Conversations with Olajide Igbalaye | Let's Make Progress",
-  description: 'An open invitation to connect with Olajide Igbalaye. Explore practical conversations around business, AI, technology, digital products, career development, and mentorship.',
+  description: 'Explore how business thinking, digital products, AI, marketing, teaching, and mentorship can turn your skills and ideas into practical next steps. Join Olajide Igbalaye for a free initial conversation.',
   alternates: { canonical: '/' },
   openGraph: {
     title: "20 Conversations with Olajide Igbalaye | Let's Make Progress",
-    description: 'An open invitation to talk about what you are building, facing, or figuring out.',
+    description: 'Turn an idea, skill, or challenge into a practical next step through business strategy, digital products, AI, and mentorship.',
     type: 'website',
     images: [{ url: '/og-campaign.png', width: 1200, height: 630, alt: '20 Conversations with Olajide Igbalaye' }],
   },

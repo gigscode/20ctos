@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use file-based source maps in development to avoid eval() CSP warnings
-  webpack(config, { dev }) {
-    if (dev) config.devtool = 'cheap-module-source-map'
-    return config
-  },
+  // Empty turbopack config satisfies the Vercel build check
+  turbopack: {},
   async headers() {
     return [
       {

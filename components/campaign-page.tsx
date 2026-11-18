@@ -5,17 +5,16 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, CircleCheck, Loc
 import CaseStudySection from './case-study-section'
 
 type Category = 'business' | 'idea' | 'career' | 'creator' | 'mentorship' | 'other'
-type Answer = 'Yes' | 'No'
 type FormState = {
   category: Category | ''
-  branch: Record<string, string>
   biggestChallenge: string
   desiredOutcome: string
   previousAttempts: string
   willingness: string
 }
 
-const initialState: FormState = { category: '', branch: {}, biggestChallenge: '', desiredOutcome: '', previousAttempts: '', willingness: '' }
+const initialState: FormState = { category: '', biggestChallenge: '', desiredOutcome: '', previousAttempts: '', willingness: '' }
+const calendlyUrl = 'https://calendly.com/gigsdev007/30min'
 
 const categories: { id: Category; title: string; description: string; number: string }[] = [
   { id: 'business', title: 'I run a business', description: 'I need help with growth, technology, or day-to-day work.', number: '01' },
@@ -25,15 +24,6 @@ const categories: { id: Category; title: string; description: string; number: st
   { id: 'mentorship', title: 'I want some direction', description: 'I could use a fresh point of view or a mentor.', number: '05' },
   { id: 'other', title: 'Something else', description: 'My situation is a little different.', number: '06' },
 ]
-
-const prompts: Record<Category, { questions: string[]; open: string }> = {
-  business: { questions: ['Are you running a business right now?', 'Do you get enquiries that do not turn into customers?', 'Do you use AI or automation in your business?', 'Would you pay for a solution to an important business problem?'], open: 'What is the biggest challenge your business is facing?' },
-  idea: { questions: ['Do you have an idea or experience you want to build on?', 'Have you tried to build or launch something around it?', 'Do you have the skills or support you need to take the next step?', 'Would expert help be useful to you?'], open: 'What knowledge, experience, or idea would you like to build on?' },
-  career: { questions: ['Are you happy with your work direction right now?', 'Are you learning a skill to open new doors?', 'Have you thought about freelance or remote work?', 'Would a mentor or practical training help?'], open: 'What feels hardest about your career or skills right now?' },
-  creator: { questions: ['Do you earn money from your creative or digital skills?', 'Do you get clients or work on a steady basis?', 'Do you use AI in your work?', 'Would you invest in tools or training to improve your results?'], open: 'What is getting in the way of the work you want?' },
-  mentorship: { questions: ['Are you facing an important personal or work decision?', 'Would another point of view help you choose your next step?', 'Are you taking steps to work through this?', 'Would a mentor or someone to check in with help?'], open: 'What would you like to feel clearer about?' },
-  other: { questions: [], open: 'Tell me what is going on and what kind of help you are looking for.' },
-}
 
 const projects = [
   ['Remosus', 'A place to find remote work.'],
@@ -53,14 +43,8 @@ function track(event: string, detail?: string) {
 }
 
 function buildConversationSummary(form: FormState, categoryLabel?: string) {
-  const answers = Object.entries(form.branch)
-    .filter(([question, answer]) => question !== 'open' && answer)
-    .map(([question, answer]) => `${question} ${answer.toLowerCase()}`)
-
   return [
     categoryLabel ? `Where I am now: ${categoryLabel}` : '',
-    ...answers,
-    form.branch.open ? `A little more about my situation: ${form.branch.open}` : '',
     form.biggestChallenge ? `My biggest challenge: ${form.biggestChallenge}` : '',
     form.desiredOutcome ? `A useful outcome for me: ${form.desiredOutcome}` : '',
     form.previousAttempts ? `What I have tried: ${form.previousAttempts}` : '',
@@ -73,6 +57,8 @@ export default function CampaignPage() {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [consent, setConsent] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [copyStatus, setCopyStatus] = useState('')
 
@@ -81,38 +67,47 @@ export default function CampaignPage() {
     setError('')
   }
 
-  function updateBranch(question: string, answer: string) {
-    setForm((current) => ({ ...current, branch: { ...current.branch, [question]: answer } }))
-  }
-
   function next() {
     setError('')
     if (step === 0 && !form.category) {
       setError('Please choose the option that feels closest to your situation.')
       return
     }
-    if (step === 2 && (!form.biggestChallenge.trim() || !form.desiredOutcome.trim())) {
-      setError('Please answer the first two questions. You can leave the last one blank.')
-      return
-    }
-    setStep((current) => Math.min(current + 1, 3))
+    setStep(1)
   }
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
-    if (!form.willingness) {
-      setError('Please choose the option that feels right for you.')
-      return
+    setSaving(true)
+
+    try {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, consent }),
+      })
+
+      if (!response.ok) {
+        const result: unknown = await response.json().catch(() => null)
+        const message = typeof result === 'object' && result !== null && 'error' in result && typeof result.error === 'string'
+          ? result.error
+          : 'We could not save your answers. Please try again or book a conversation directly.'
+        throw new Error(message)
+      }
+
+      setDone(true)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'We could not save your answers. Please try again or book a conversation directly.')
+    } finally {
+      setSaving(false)
     }
-    track('conversation summary prepared')
-    setDone(true)
   }
 
   async function copySummary() {
     try {
       await navigator.clipboard.writeText(buildConversationSummary(form, categoryLabel))
-      setCopyStatus('Copied. Paste it into your LinkedIn message.')
+      setCopyStatus('Copied. You can paste this into your booking if you like.')
     } catch {
       setCopyStatus('Select the summary above and copy it manually.')
     }
@@ -137,9 +132,9 @@ export default function CampaignPage() {
         <div className="hero-copy">
           <div className="eyebrow"><span className="eyebrow-dot" /> OL AJIDE IGBALAYE <span className="eyebrow-divider">/</span> AN OPEN INVITATION</div>
           <h1>You have an idea, a skill, or a challenge. <span>Let&apos;s find the next step.</span></h1>
-          <p className="hero-intro">I help people turn experience and ideas into practical next steps through business thinking, digital products, AI, teaching, and mentorship. I&apos;m making room for 20 free initial conversations.</p>
-          <div className="hero-actions"><a className="button button-dark" href="#conversation" onClick={() => track('CTA clicked', 'hero')}>Start the conversation <ArrowRight size={17} /></a><a className="text-link" href="#about">Get to know me <ArrowDown size={15} /></a></div>
-          <div className="availability"><span className="availability-mark"><CircleCheck size={16} /></span><span><strong>20 free conversations</strong><small>No pitch, just a useful first step</small></span></div>
+          <p className="hero-intro">I help people turn experience and ideas into practical next steps through business thinking, digital products, AI, teaching, and mentorship. I&apos;m making room for 20 free, 30-minute conversations.</p>
+          <div className="hero-actions"><a className="button button-dark" href={calendlyUrl} target="_blank" rel="noreferrer" onClick={() => track('CTA clicked', 'hero booking')}>Choose a time <ArrowUpRight size={17} /></a><a className="text-link" href="#conversation">Prepare for a conversation <ArrowDown size={15} /></a></div>
+          <div className="availability"><span className="availability-mark"><CircleCheck size={16} /></span><span><strong>20 free conversations</strong><small>30 minutes, no pitch</small></span></div>
         </div>
         <figure className="hero-portrait">
           <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Cinematic%20Creator%20Portrait%20with%20Warm%20Rim%20Light-YD6jISnSpNz4i4WuHmEQ7h5hmChwLd.png" alt="Olajide Igbalaye smiling in a black shirt" />
@@ -188,17 +183,15 @@ export default function CampaignPage() {
       <section className="conversation section-pad" id="conversation">
         <div className="section-kicker">YOUR TURN <span>05 / 05</span></div>
         <div className="conversation-grid">
-          <div className="conversation-intro"><div className="small-label">20 CONVERSATIONS. ONE PURPOSE: PROGRESS.</div><h2>Tell me a little about <em>you.</em></h2><p>A few simple questions can help you clarify what matters before we talk.</p><div className="privacy-note"><LockKeyhole size={17} /><span>This worksheet stays in your browser. Nothing is sent or stored. Share only what you are comfortable copying into a message.</span></div></div>
+          <div className="conversation-intro"><div className="small-label">20 CONVERSATIONS. ONE PURPOSE: PROGRESS.</div><h2>Tell me a little about <em>you.</em></h2><p>The conversation is free and lasts 30 minutes. There is no pitch. You can book directly, or share a few answers to help me understand what people need.</p><div className="privacy-note"><LockKeyhole size={17} /><span>If you choose to submit your answers, they are saved for research and conversation preparation. They are not sent to analytics. This form does not ask for your name or email.</span></div><a className="under-link" href={calendlyUrl} target="_blank" rel="noreferrer" onClick={() => track('Calendly booking clicked')}>Skip the notes and choose a time <ArrowUpRight size={15} /></a></div>
           <div className="form-panel">
-            {done ? <div className="success-state"><div className="success-icon"><Check size={22} /></div><div className="small-label">YOUR NOTE IS READY</div><h3>Start with a clearer message.</h3><p>Your answers have not been sent or saved. Copy this note and paste it into a LinkedIn message when you are ready.</p><label className="summary-label" htmlFor="conversation-summary">MESSAGE DRAFT</label><textarea className="summary-output" id="conversation-summary" value={buildConversationSummary(form, categoryLabel)} readOnly rows={9} /><p className="copy-status" role="status" aria-live="polite">{copyStatus}</p><div className="summary-actions"><button className="button button-dark" type="button" onClick={() => void copySummary()}>Copy my summary</button><a className="button button-light" href="https://www.linkedin.com/in/olajide-igbalaye/" target="_blank" rel="noreferrer" onClick={() => track('LinkedIn handoff clicked')}>Open LinkedIn <ArrowUpRight size={16} /></a></div></div> : <form onSubmit={submit}>
-              <div className="form-progress"><div><span>CONVERSATION NOTES</span><b>STEP {step + 1} OF 4</b></div><div className="progress-track"><span style={{ width: `${((step + 1) / 4) * 100}%` }} /></div></div>
+            {done ? <div className="success-state"><div className="success-icon"><Check size={22} /></div><div className="small-label">ANSWERS SAVED</div><h3>Thank you for sharing.</h3><p>Your answers were saved. They were not sent to analytics, and they did not book a call. Choose a time in Calendly when you are ready.</p><label className="summary-label" htmlFor="conversation-summary">YOUR OPTIONAL CONVERSATION NOTES</label><textarea className="summary-output" id="conversation-summary" value={buildConversationSummary(form, categoryLabel)} readOnly rows={9} /><p className="copy-status" role="status" aria-live="polite">{copyStatus}</p><div className="summary-actions"><a className="button button-dark" href={calendlyUrl} target="_blank" rel="noreferrer" onClick={() => track('Calendly booking clicked')}>Choose a time in Calendly <ArrowUpRight size={16} /></a><button className="button button-light" type="button" onClick={() => void copySummary()}>Copy my notes</button></div></div> : <form onSubmit={submit}>
+              <div className="form-progress"><div><span>OPTIONAL PREPARATION</span><b>STEP {step + 1} OF 2</b></div><div className="progress-track"><span style={{ width: `${((step + 1) / 2) * 100}%` }} /></div></div>
               {step === 0 && <div className="form-step"><h3>Where are you right now?</h3><p>Choose the one that feels closest. There is no wrong answer.</p><div className="category-options">{categories.map((item) => <button type="button" key={item.id} aria-pressed={form.category === item.id} className={form.category === item.id ? 'category-option is-selected' : 'category-option'} onClick={() => { update('category', item.id); track('audience category selected', item.id) }}><span className="category-number">{item.number}</span><span className="category-copy"><strong>{item.title}</strong><small>{item.description}</small></span><span className="radio-dot" /></button>)}</div></div>}
-              {step === 1 && form.category && <div className="form-step"><h3>{form.category === 'other' ? 'Help me understand your situation.' : 'A little more about your situation.'}</h3><p>Answer what you can. It is okay if you are still figuring things out.</p>{prompts[form.category].questions.map((question) => <fieldset className="answer-field" key={question}><legend>{question}</legend><div className="answer-options">{(['Yes', 'No'] as Answer[]).map((answer) => <button key={answer} type="button" aria-pressed={form.branch[question] === answer} className={form.branch[question] === answer ? 'answer-choice answer-active' : 'answer-choice'} onClick={() => updateBranch(question, answer)}>{answer}</button>)}</div></fieldset>)}<label className="field"><span>{prompts[form.category].open}</span><textarea value={form.branch.open || ''} onChange={(event) => updateBranch('open', event.target.value)} rows={3} placeholder="Take your time..." /></label></div>}
-              {step === 2 && <div className="form-step"><h3>What would make this time useful?</h3><p>There is no need to have it all worked out before you answer.</p><label className="field"><span>What is the biggest challenge you are trying to get past? *</span><textarea value={form.biggestChallenge} onChange={(event) => update('biggestChallenge', event.target.value)} rows={3} placeholder="Share what feels important" required /></label><label className="field"><span>If we talk, what is one useful thing you would like to leave with? *</span><textarea value={form.desiredOutcome} onChange={(event) => update('desiredOutcome', event.target.value)} rows={3} placeholder="A clearer next step? A new idea?" required /></label><label className="field"><span>Have you tried anything so far? What happened?</span><textarea value={form.previousAttempts} onChange={(event) => update('previousAttempts', event.target.value)} rows={2} placeholder="Optional" /></label></div>}
-              {step === 3 && <div className="form-step"><h3>One last thing.</h3><p>This helps frame what kind of support might be useful. No pressure.</p><fieldset className="answer-field"><legend>Would you be open to a paid solution if we find one that truly helps?</legend><div className="willing-options">{['Yes', 'Maybe, depending on the solution', 'Not at the moment'].map((choice) => <button type="button" key={choice} aria-pressed={form.willingness === choice} className={form.willingness === choice ? 'answer-choice answer-active' : 'answer-choice'} onClick={() => update('willingness', choice)}>{choice}</button>)}</div></fieldset></div>}
+              {step === 1 && <div className="form-step"><h3>What would make this time useful?</h3><p>These two questions help you focus on what matters. The extra questions are optional.</p><label className="field"><span>What is the biggest challenge you are trying to get past? *</span><textarea value={form.biggestChallenge} onChange={(event) => update('biggestChallenge', event.target.value)} rows={3} maxLength={2000} placeholder="Share what feels important" required /></label><label className="field"><span>If we talk, what is one useful thing you would like to leave with? *</span><textarea value={form.desiredOutcome} onChange={(event) => update('desiredOutcome', event.target.value)} rows={3} maxLength={2000} placeholder="A clearer next step? A new idea?" required /></label><label className="field"><span>Have you tried anything so far? What happened? (optional)</span><textarea value={form.previousAttempts} onChange={(event) => update('previousAttempts', event.target.value)} rows={2} maxLength={2000} placeholder="Optional" /></label><fieldset className="answer-field"><legend>Would you consider paid support if it felt like the right fit? (optional)</legend><div className="willing-options">{['Yes', 'Maybe, depending on the solution', 'Not at the moment'].map((choice) => <button type="button" key={choice} aria-pressed={form.willingness === choice} className={form.willingness === choice ? 'answer-choice answer-active' : 'answer-choice'} onClick={() => update('willingness', choice)}>{choice}</button>)}</div></fieldset><label className="consent-field"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} required /><span>I agree to save these answers so Olajide can understand what people need and prepare for conversations. I understand they will not be sent to analytics.</span></label></div>}
               {error && <p className="form-error" role="alert">{error}</p>}
-              <div className="form-actions">{step > 0 ? <button className="back-button" type="button" onClick={() => { setStep((current) => current - 1); setError('') }}><ArrowLeft size={16} /> Back</button> : <span />}{step < 3 ? <button className="button button-dark" type="button" onClick={() => { if (step === 0) track('form started'); next() }}>Continue <ArrowRight size={16} /></button> : <button className="button button-dark" type="submit">Prepare my message <ArrowRight size={16} /></button>}</div>
-              <p className="form-footnote">{categoryLabel ? `Here for: ${categoryLabel}` : 'Nothing is sent from this worksheet.'}</p>
+              <div className="form-actions">{step > 0 ? <button className="back-button" type="button" onClick={() => { setStep((current) => current - 1); setError('') }}><ArrowLeft size={16} /> Back</button> : <span />}{step === 0 ? <button className="button button-dark" type="button" onClick={() => { track('form started'); next() }}>Continue <ArrowRight size={16} /></button> : <button className="button button-dark" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save my answers'} <ArrowRight size={16} /></button>}</div>
+              <p className="form-footnote">{categoryLabel ? `Here for: ${categoryLabel}` : 'Your answers are not sent unless you submit them.'}</p>
             </form>}
           </div>
         </div>

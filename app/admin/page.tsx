@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { adminSessionCookie, isAdminAuthConfigured, isValidAdminSession } from '@/lib/admin-auth'
 import AdminDashboard, { type AdminResponse } from './response-dashboard'
 
@@ -22,6 +22,22 @@ type SearchParams = Promise<{
   to?: string
 }>
 
+// Reuse the client across requests in the same function instance.
+// In serverless the module is re-evaluated on each cold start, so this only
+// helps warm invocations, but it eliminates the extra allocation on every hit.
+let _supabase: SupabaseClient | null = null
+function getSupabase(): SupabaseClient | null {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) return null
+  if (!_supabase) {
+    _supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false },
+    })
+  }
+  return _supabase
+}
+
 function validDate(value: string | undefined): value is string {
   return Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00.000Z`)))
 }
@@ -33,15 +49,11 @@ function nextDay(value: string) {
 }
 
 async function loadResponses(filters: { category?: Category; from?: string; to?: string }) {
-  const supabaseUrl = process.env.SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) {
+  const supabase = getSupabase()
+  if (!supabase) {
     return { responses: [], error: 'Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to the server environment to load private responses.' }
   }
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, detectSessionInUrl: false, persistSession: false },
-  })
   const responses: AdminResponse[] = []
 
   for (let offset = 0; ; offset += pageSize) {

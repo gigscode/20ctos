@@ -185,22 +185,35 @@ em { color: #726bf4; font-family: Georgia, 'Times New Roman', serif; font-weight
 .summary-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .questionnaire-dialog { width: min(590px, calc(100% - 32px)); max-width: none; max-height: min(88dvh, 820px); margin: auto; padding: clamp(22px, 5vw, 42px); overflow-y: auto; border: 1px solid #e8e7e3; background: #fafaf8; color: #17181d; box-shadow: 0 24px 90px #17181d2e; }
 .questionnaire-dialog::backdrop { background: #17181d99; backdrop-filter: blur(3px); }
+.questionnaire-dialog button:focus-visible, .questionnaire-dialog input:focus-visible { outline: 3px solid #6258c8; outline-offset: 3px; }
 .questionnaire-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.questionnaire-header .small-label { color: #55535c; font-size: 12px; line-height: 1.4; }
 .questionnaire-close { width: 40px; height: 40px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #e8e7e3; border-radius: 50%; background: #fff; color: #55535c; cursor: pointer; }
 .questionnaire-close:hover { border-color: #827cf0; color: #4841b4; }
 .questionnaire-dialog > h1 { margin: 26px 0 8px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(34px, 7vw, 47px); font-weight: 400; letter-spacing: -1.2px; line-height: 1.1; }
-.questionnaire-intro { max-width: 470px; margin: 0; color: #686873; font-size: 12px; line-height: 1.75; }
+.questionnaire-intro { max-width: 470px; margin: 0; color: #55535c; font-size: 16px; line-height: 1.65; }
 .questionnaire-dialog .form-step { padding-top: 24px; }
 .questionnaire-dialog .form-step h2 { margin: 0 0 15px; font-family: Georgia, 'Times New Roman', serif; font-size: 23px; font-weight: 400; letter-spacing: -.4px; line-height: 1.25; }
 .questionnaire-dialog .form-progress { margin-top: 22px; }
+.questionnaire-dialog .form-progress > div:first-child, .questionnaire-dialog .form-progress b { color: #55535c; font-size: 12px; line-height: 1.4; }
+.questionnaire-dialog .progress-track { height: 4px; }
 .quick-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.quick-choice { min-height: 48px; padding: 10px 12px; border: 1px solid #e2e0dc; border-radius: 3px; background: #fff; color: #47464e; font-size: 11px; line-height: 1.45; text-align: left; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+.quick-choice { min-height: 52px; padding: 12px 14px; border: 1px solid #e2e0dc; border-radius: 3px; background: #fff; color: #37363d; font-size: 16px; line-height: 1.45; text-align: left; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease; }
 .quick-choice:hover, .quick-choice.is-selected { border-color: #827cf0; background: #f4f2ff; color: #4841b4; }
 .questionnaire-dialog .form-step h2.quick-subheading { margin-top: 24px; }
 .questionnaire-dialog .category-options { gap: 6px; }
-.questionnaire-dialog .category-option { min-height: 52px; }
+.questionnaire-dialog .category-option { min-height: 60px; }
+.questionnaire-dialog .category-number { color: #55535c; font-size: 12px; }
+.questionnaire-dialog .category-copy { gap: 5px; }
+.questionnaire-dialog .category-copy strong { font-size: 16px; }
+.questionnaire-dialog .category-copy small { color: #55535c; font-size: 14px; line-height: 1.45; }
 .questionnaire-dialog .form-actions { margin-top: 20px; }
-.questionnaire-footnote { display: flex; align-items: center; gap: 7px; margin: 17px 0 0; color: #777780; font-size: 10px; line-height: 1.5; }
+.questionnaire-dialog .back-button { color: #47464e; font-size: 16px; }
+.questionnaire-dialog .form-actions .button { min-height: 48px; padding: 0 18px; font-size: 16px; }
+.questionnaire-dialog .consent-field { gap: 12px; color: #47464e; font-size: 16px; line-height: 1.55; }
+.questionnaire-dialog .consent-field input { width: 20px; height: 20px; margin-top: 2px; }
+.questionnaire-dialog .form-error { color: #7d2422; font-size: 16px; line-height: 1.55; }
+.questionnaire-footnote { display: flex; align-items: center; gap: 8px; margin: 17px 0 0; color: #55535c; font-size: 14px; line-height: 1.55; }
 .questionnaire-footnote svg { flex: 0 0 auto; color: #726bf4; }
 .saved-notice { margin: 14px 0 0; color: #6258c8; font-size: 11px; line-height: 1.5; }
 .questionnaire-reopen { margin-top: 12px; border: 0; border-bottom: 1px solid #c9c7ce; background: transparent; cursor: pointer; }

@@ -203,7 +203,6 @@ export default function CampaignPage() {
           {error && <p className="form-error" role="alert">{error}</p>}
           <div className="form-actions"><button className="back-button" type="button" onClick={() => step === 0 ? dismissQuestionnaire() : setStep((current) => current - 1)}>{step === 0 ? 'Skip for now' : <><ArrowLeft size={16} /> Back</>}</button>{step < 2 ? <button className="button button-dark" type="button" disabled={(step === 0 && !form.category) || (step === 1 && (!form.biggestChallenge || !form.previousAttempts))} onClick={next}>Continue <ArrowRight size={16} /></button> : <button className="button button-dark" type="submit" disabled={saving || !form.desiredOutcome || !form.willingness || !consent}>{saving ? 'Saving...' : 'Save and continue'} <ArrowRight size={16} /></button>}</div>
         </form>
-        <p className="questionnaire-footnote"><LockKeyhole size={13} /> Saving is optional. Skip the questions and explore the page any time.</p>
       </dialog>
 
       <main>

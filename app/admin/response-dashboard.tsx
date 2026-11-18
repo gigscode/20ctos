@@ -172,7 +172,7 @@ function WeeklyTrend({ weekCounts }: { weekCounts: number[] }) {
         <line x1="20" y1="57" x2="263" y2="57" />
         <line x1="20" y1="22" x2="263" y2="22" />
         <polyline points={points} />
-        {counts.map((count, index) => <circle key={index} cx={22 + index * 43} cy={91 - (count / max) * 68} r="3.5"><title>{count} responses</title></circle>)}
+        {counts.map((count, index) => <circle key={index} cx={22 + index * 43} cy={91 - (count / max) * 68} r="3.5"><title>{`${count} responses`}</title></circle>)}
       </svg>
       <div className="admin-trend-labels"><span>7 weeks ago</span><span>This week</span></div>
     </div>

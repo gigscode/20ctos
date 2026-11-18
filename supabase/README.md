@@ -1,6 +1,6 @@
 # Saving conversation answers
 
-The site saves answers only when someone checks the consent box and submits the notes. Booking through Calendly does not require submitting these notes. The form does not ask for a name or email, and answers are not sent to analytics.
+The site opens with a short, tap-based questionnaire. People can skip it and explore the page or book through Calendly. Answers are saved only after someone agrees and submits. The form does not ask for a name or email, and answers are not sent to analytics.
 
 ## Connect a Supabase project
 
@@ -14,6 +14,6 @@ Keep `.env.local` on your computer and out of source control. The site uses the 
 
 ## Review answers
 
-Run the queries in `analysis.sql` in the Supabase SQL Editor to compare audience categories and willingness to consider paid support, or to read the submitted answers. The free-text answers may contain personal information, so keep them private and do not copy them into analytics.
+Run the queries in `analysis.sql` in the Supabase SQL Editor to compare audience categories, common challenges, desired outcomes, and willingness to consider paid support.
 
-Keep submissions for no longer than 12 months, then delete them in the Table Editor. Do not ask visitors to include sensitive personal information in their answers.
+Keep submissions for no longer than 12 months, then delete them in the Table Editor. The database requires consent for each submission and only accepts the listed answer choices.

@@ -22,9 +22,7 @@ There is no pitch and no need to have everything figured out. The aim is to list
 
 ## What happens next
 
-Tell me a little about what is going on and what you hope to get from a conversation. Your details are meant to help arrange that conversation and follow up about what you shared. They are not for marketing messages.
-
-The conversation form is not accepting responses yet. You can reach me on [LinkedIn](https://www.linkedin.com/in/olajide-igbalaye/) while I get it ready.
+You can choose a free 30-minute conversation in Calendly. The quick questions on the page are optional and can help me understand what people are working through. They do not ask for your name or email. Your answers are saved only if you agree and the page confirms they were saved. If saving is unavailable, you can still book a time.
 
 ## A little about my work
 

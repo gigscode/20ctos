@@ -2,17 +2,30 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 const categories = ['business', 'idea', 'career', 'creator', 'mentorship', 'other'] as const
-const willingnessOptions = ['Yes', 'Maybe, depending on the solution', 'Not at the moment'] as const
-const maxAnswerLength = 2000
-const maxBodyLength = 10_000
+const challenges: Record<(typeof categories)[number], string[]> = {
+  business: ['steady_enquiries', 'converting_customers', 'growing_sales', 'day_to_day_work', 'using_technology', 'something_else'],
+  idea: ['choosing_what_to_build', 'testing_an_idea', 'shaping_an_offer', 'building_first_version', 'finding_first_customers', 'something_else'],
+  career: ['choosing_direction', 'learning_a_skill', 'finding_opportunities', 'changing_careers', 'building_confidence', 'something_else'],
+  creator: ['finding_clients', 'pricing_work', 'promoting_work', 'managing_workload', 'growing_income', 'something_else'],
+  mentorship: ['difficult_decision', 'choosing_next_step', 'building_confidence', 'staying_accountable', 'talking_it_through', 'something_else'],
+  other: ['finding_direction', 'solving_a_problem', 'building_a_skill', 'getting_unstuck', 'something_else'],
+}
+const triedOptions = ['not_yet', 'on_my_own', 'advice_or_information', 'course_tool_or_service', 'professional_help']
+const outcomeOptions = ['clear_next_step', 'practical_plan', 'feedback_on_idea', 'tools_or_skills', 'fresh_perspective']
+const willingnessOptions = ['yes', 'maybe', 'not_now']
+const maxBodyLength = 2000
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+function isCategory(value: unknown): value is (typeof categories)[number] {
+  return typeof value === 'string' && categories.some((option) => option === value)
+}
+
 export async function POST(request: Request) {
   const origin = request.headers.get('origin')
-  if (origin && origin !== new URL(request.url).origin) {
+  if (!origin || origin !== new URL(request.url).origin) {
     return NextResponse.json({ error: 'This request could not be accepted.' }, { status: 403 })
   }
 
@@ -48,22 +61,25 @@ export async function POST(request: Request) {
   }
 
   const category = body.category
-  const biggestChallenge = typeof body.biggestChallenge === 'string' ? body.biggestChallenge.trim() : ''
-  const desiredOutcome = typeof body.desiredOutcome === 'string' ? body.desiredOutcome.trim() : ''
-  const previousAttempts = typeof body.previousAttempts === 'string' ? body.previousAttempts.trim() : ''
+  const biggestChallenge = body.biggestChallenge
+  const desiredOutcome = body.desiredOutcome
+  const previousAttempts = body.previousAttempts
   const willingness = body.willingness
 
-  if (!categories.some((option) => option === category)) {
+  if (!isCategory(category)) {
     return NextResponse.json({ error: 'Please choose the option that feels closest to your situation.' }, { status: 400 })
   }
-  if (!biggestChallenge || biggestChallenge.length > maxAnswerLength || !desiredOutcome || desiredOutcome.length > maxAnswerLength) {
-    return NextResponse.json({ error: 'Please answer both questions and keep each answer under 2,000 characters.' }, { status: 400 })
+  if (typeof biggestChallenge !== 'string' || !challenges[category].includes(biggestChallenge)) {
+    return NextResponse.json({ error: 'Please choose the option that best describes your main challenge.' }, { status: 400 })
   }
-  if (previousAttempts.length > maxAnswerLength) {
-    return NextResponse.json({ error: 'Please keep the optional answer under 2,000 characters.' }, { status: 400 })
+  if (typeof previousAttempts !== 'string' || !triedOptions.includes(previousAttempts)) {
+    return NextResponse.json({ error: 'Please choose what you have tried so far.' }, { status: 400 })
   }
-  if (willingness !== '' && !willingnessOptions.some((option) => option === willingness)) {
-    return NextResponse.json({ error: 'Please check your optional answer and try again.' }, { status: 400 })
+  if (typeof desiredOutcome !== 'string' || !outcomeOptions.includes(desiredOutcome)) {
+    return NextResponse.json({ error: 'Please choose the outcome that would be most useful.' }, { status: 400 })
+  }
+  if (typeof willingness !== 'string' || !willingnessOptions.includes(willingness)) {
+    return NextResponse.json({ error: 'Please choose an answer about paid support.' }, { status: 400 })
   }
   if (body.consent !== true) {
     return NextResponse.json({ error: 'Please agree before saving your answers.' }, { status: 400 })
@@ -84,8 +100,9 @@ export async function POST(request: Request) {
       category,
       biggest_challenge: biggestChallenge,
       desired_outcome: desiredOutcome,
-      previous_attempts: previousAttempts || null,
-      willingness: willingness || null,
+      previous_attempts: previousAttempts,
+      willingness,
+      consent: true,
     })
 
     if (error) {

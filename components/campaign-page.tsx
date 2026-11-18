@@ -47,9 +47,6 @@ const projects = [
   ['Ship Fast With AI', 'Practical lessons for making products with AI.'],
   ['ituwaAfrica', 'A place to learn digital skills.'],
   ['Secquiz', 'Cybersecurity learning and practice.'],
-  ['Secacad', 'A platform for cybersecurity assessments.'],
-  ['Soprep', 'Study support with AI.'],
-  ['Phytogenix', 'A digital home for research.'],
 ]
 
 const answerGroups = [

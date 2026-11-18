@@ -49,12 +49,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .menu-toggle { display: none; border: 0; background: transparent; padding: 8px; }
 .page-pad, .section-pad { padding-left: max(7.1%, calc((100% - 1216px) / 2)); padding-right: max(7.1%, calc((100% - 1216px) / 2)); }
 .hero { min-height: 590px; position: relative; display: flex; align-items: center; padding-top: 82px; padding-bottom: 100px; overflow: hidden; }
-.hero-copy { width: min(760px, 78%); position: relative; z-index: 1; }
+.hero-copy { width: min(760px, 50%); position: relative; z-index: 1; }
+.hero-portrait { position: absolute; z-index: 0; top: 50%; right: 7.1%; width: min(39%, 465px); margin: 0; transform: translateY(-50%); }
+.hero-portrait img { display: block; width: 100%; aspect-ratio: 1.2; object-fit: cover; object-position: center 36%; background: #11131a; }
+.hero-portrait figcaption { display: flex; gap: 8px; margin-top: 11px; color: #777780; font-size: 8px; font-weight: 700; letter-spacing: 1px; }
+.hero-portrait figcaption span { color: #726bf4; }
 .eyebrow, .small-label, .section-kicker, .hero-footnote, .closing-mark, .copyright { font-size: 9px; letter-spacing: 1.1px; font-weight: 700; }
 .eyebrow { display: flex; align-items: center; gap: 9px; color: #6d6b73; }
 .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #726bf4; }
 .eyebrow-divider { color: #c5c3cb; }
-.hero h1 { max-width: 800px; margin: 28px 0 20px; font-size: clamp(43px, 6.2vw, 79px); line-height: 1.04; letter-spacing: -5.5px; font-weight: 500; }
+.hero h1 { max-width: 800px; margin: 28px 0 20px; font-size: clamp(43px, 5.8vw, 69px); line-height: 1.04; letter-spacing: -4.2px; font-weight: 500; }
 .hero h1 span { color: #77727f; }
 .hero-intro { max-width: 525px; color: #686873; font-size: 14px; line-height: 1.85; }
 .hero-actions { display: flex; align-items: center; gap: 28px; margin-top: 30px; }
@@ -181,7 +185,8 @@ em { color: #726bf4; font-family: Georgia, 'Times New Roman', serif; font-weight
 @media (max-width: 900px) {
   .hero { min-height: 570px; }
   .hero h1 { letter-spacing: -3.5px; }
-  .hero-aside { right: 7%; width: 125px; }
+  .hero-copy { width: 52%; }
+  .hero-portrait { right: 6%; width: 37%; }
   .about-grid, .who-grid, .conversation-grid { gap: 8%; }
   .experience-grid { grid-template-columns: repeat(3, 1fr); }
   .experience-card:nth-child(4) { padding-left: 0; border-left: 0; border-top: 1px solid #e8e7e3; }
@@ -197,8 +202,11 @@ em { color: #726bf4; font-family: Georgia, 'Times New Roman', serif; font-weight
   .nav-links a { padding: 14px 0; }
   .nav-cta { justify-content: space-between; border-top: 1px solid #e8e7e3; }
   .page-pad, .section-pad { padding-left: 6%; padding-right: 6%; }
-  .hero { min-height: auto; padding-top: 78px; padding-bottom: 100px; }
+  .hero { min-height: auto; padding-top: 78px; padding-bottom: 100px; flex-wrap: wrap; }
   .hero-copy { width: 100%; }
+  .hero-portrait { position: relative; top: auto; right: auto; width: 100%; max-width: 430px; margin-top: 31px; transform: none; }
+  .hero-portrait img { aspect-ratio: 1.35; object-position: center 34%; }
+  .hero-portrait figcaption { font-size: 7px; }
   .eyebrow { font-size: 7px; letter-spacing: .9px; }
   .hero h1 { margin-top: 23px; font-size: clamp(43px, 13vw, 64px); letter-spacing: -3.5px; line-height: 1.03; }
   .hero-intro { font-size: 12px; line-height: 1.85; }

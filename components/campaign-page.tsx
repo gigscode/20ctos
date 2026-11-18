@@ -144,9 +144,10 @@ export default function CampaignPage() {
           <div className="hero-actions"><a className="button button-dark" href="#conversation" onClick={() => track('CTA clicked', 'hero')}>Book a conversation <ArrowRight size={17} /></a><a className="text-link" href="#about">Get to know me <ArrowDown size={15} /></a></div>
           <div className="availability"><span className="availability-mark"><CircleCheck size={16} /></span><span><strong>20 conversations</strong><small>An open invitation to start with a chat</small></span></div>
         </div>
-        <div className="hero-aside" aria-label="Campaign message">
-          <div className="aside-rule" /><p>Good things often start with a conversation.</p><span>01 / 20</span>
-        </div>
+        <figure className="hero-portrait">
+          <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Cinematic%20Creator%20Portrait%20with%20Warm%20Rim%20Light-YD6jISnSpNz4i4WuHmEQ7h5hmChwLd.png" alt="Olajide Igbalaye smiling in a black shirt" />
+          <figcaption>OLAJIDE IGBALAYE <span>·</span> BUILDER, TEACHER, MENTOR</figcaption>
+        </figure>
         <div className="hero-footnote">A LITTLE TIME. A REAL CONVERSATION. ROOM TO MAKE PROGRESS.</div>
       </section>
 

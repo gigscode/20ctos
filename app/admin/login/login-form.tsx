@@ -57,6 +57,8 @@ export default function AdminLoginForm() {
           type="button"
           className="admin-password-toggle"
           aria-label={show ? 'Hide password' : 'Show password'}
+          tabIndex={-1}
+          onPointerDown={(e) => e.preventDefault()}
           onClick={() => setShow((v) => !v)}
         >
           {show ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}

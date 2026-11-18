@@ -5,7 +5,7 @@ The site opens with a short, tap-based questionnaire. People can skip it and exp
 ## Connect a Supabase project
 
 1. Create a Supabase project.
-2. Apply all migrations in order. In the Supabase SQL Editor, run `migrations/20261118200000_create_conversation_submissions.sql`, `migrations/20261118214500_add_contact_email.sql`, and `migrations/20261118220000_remove_required_submission_consent.sql`. The last migration is required for the current form to save answers. Or, authenticate with `pnpm exec supabase login`, then run `pnpm exec supabase link --project-ref YOUR_PROJECT_REF` and `pnpm exec supabase db push`. The CLI may ask for your database password in the terminal.
+2. Apply all migrations in order. In the Supabase SQL Editor, run `migrations/20261118200000_create_conversation_submissions.sql`, `migrations/20261118214500_add_contact_email.sql`, `migrations/20261118220000_remove_required_submission_consent.sql`, and `migrations/20261118230000_prevent_duplicate_email_submissions.sql`. The latest migration also brings older databases up to date with the current consent handling and prevents duplicate email submissions. Or, authenticate with `pnpm exec supabase login`, then run `pnpm exec supabase link --project-ref YOUR_PROJECT_REF` and `pnpm exec supabase db push`. The CLI may ask for your database password in the terminal.
 3. Copy `.env.example` to `.env.local` in the project root.
 4. In the Supabase project settings, copy the project URL and anon key into `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env.local`.
 5. Restart the Next.js development server.

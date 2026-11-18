@@ -14,6 +14,7 @@ const triedOptions = ['not_yet', 'on_my_own', 'advice_or_information', 'course_t
 const outcomeOptions = ['clear_next_step', 'practical_plan', 'feedback_on_idea', 'tools_or_skills', 'fresh_perspective']
 const willingnessOptions = ['yes', 'maybe', 'not_now']
 const maxBodyLength = 2000
+const emailUniqueIndex = 'conversation_submissions_email_unique_idx'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
     })
     const { error } = await supabase.from('conversation_submissions').insert({
       category,
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       biggest_challenge: biggestChallenge,
       desired_outcome: desiredOutcome,
       previous_attempts: previousAttempts,
@@ -111,6 +112,13 @@ export async function POST(request: Request) {
     })
 
     if (error) {
+      if (error.code === '23505' && error.message.includes(emailUniqueIndex)) {
+        return NextResponse.json(
+          { error: 'This email address has already been used to submit answers. You can still book a conversation directly.' },
+          { status: 409 },
+        )
+      }
+
       console.error('Supabase could not save conversation answers:', {
         code: error.code,
         message: error.message,

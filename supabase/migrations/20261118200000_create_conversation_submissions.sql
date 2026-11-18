@@ -1,4 +1,4 @@
-create table public.conversation_submissions (
+create table if not exists public.conversation_submissions (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   consented_at timestamptz not null default now(),
@@ -18,23 +18,37 @@ create table public.conversation_submissions (
   )
 );
 
-create index conversation_submissions_created_at_idx
+create index if not exists conversation_submissions_created_at_idx
   on public.conversation_submissions (created_at desc);
 
-create index conversation_submissions_category_created_at_idx
+create index if not exists conversation_submissions_category_created_at_idx
   on public.conversation_submissions (category, created_at desc);
 
-create index conversation_submissions_challenge_idx
+create index if not exists conversation_submissions_challenge_idx
   on public.conversation_submissions (biggest_challenge);
 
 alter table public.conversation_submissions enable row level security;
 
+-- Revoke public/anon access and grant only what is needed
 revoke all on public.conversation_submissions from public, anon, authenticated;
 grant insert (category, biggest_challenge, desired_outcome, previous_attempts, willingness, consent)
   on public.conversation_submissions to anon;
 
-create policy "Allow anonymous answer submissions"
-  on public.conversation_submissions
-  for insert
-  to anon
-  with check (true);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'conversation_submissions'
+      and policyname = 'Allow anonymous answer submissions'
+  ) then
+    execute $policy$
+      create policy "Allow anonymous answer submissions"
+        on public.conversation_submissions
+        for insert
+        to anon
+        with check (true)
+    $policy$;
+  end if;
+end
+$$;

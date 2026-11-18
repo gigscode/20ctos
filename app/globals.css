@@ -349,8 +349,12 @@ em { color: #6e3115; font-weight: 400; }
 .admin-login-copy { margin: 0 0 26px; color: #55535c; font-size: 15px; line-height: 1.6; }
 .admin-login-form { display: flex; flex-direction: column; gap: 8px; }
 .admin-login-form label { color: #47464e; font-size: 11px; font-weight: 600; }
-.admin-login-form input[type="password"] { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #dddbd8; border-radius: 2px; background: #fff; color: #17181d; font-size: 15px; outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
-.admin-login-form input[type="password"]:focus { border-color: #305b7e; box-shadow: 0 0 0 3px #305b7e26; }
+.admin-password-wrap { position: relative; display: flex; align-items: center; }
+.admin-password-wrap input { width: 100%; min-height: 44px; padding: 10px 42px 10px 12px; border: 1px solid #dddbd8; border-radius: 2px; background: #fff; color: #17181d; font-size: 15px; outline: none; transition: border-color .18s ease, box-shadow .18s ease; }
+.admin-password-wrap input:focus { border-color: #305b7e; box-shadow: 0 0 0 3px #305b7e26; }
+.admin-password-toggle { position: absolute; right: 0; width: 42px; height: 100%; display: grid; place-items: center; border: none; background: transparent; color: #9b99a0; cursor: pointer; }
+.admin-password-toggle:hover { color: #37363d; }
+.admin-password-toggle:focus-visible { outline: 2px solid #305b7e; outline-offset: -2px; border-radius: 2px; }
 .admin-login-form button[type="submit"] { margin-top: 8px; min-height: 46px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: none; border-radius: 2px; background: #071524; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s ease; }
 .admin-login-form button[type="submit"]:hover { background: #1e3653; }
 .admin-login-form button[type="submit"]:disabled { opacity: .6; cursor: wait; }

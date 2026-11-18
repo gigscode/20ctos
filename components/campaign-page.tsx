@@ -171,11 +171,7 @@ export default function CampaignPage() {
         throw new Error(message)
       }
 
-      setQuestionnaireOpen(false)
-      setForm(initialState)
-      setConsent(false)
-      setEmailUpdatesConsent(false)
-      setSavedNotice(true)
+      window.location.assign(calendlyUrl)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'We could not save your answers. Please try again or book a conversation directly.')
     } finally {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, CircleCheck, LockKeyhole, Menu, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, CircleCheck, LockKeyhole } from 'lucide-react'
 
 type Category = 'business' | 'idea' | 'career' | 'creator' | 'mentorship' | 'other'
 type Answer = 'Yes' | 'No'
@@ -130,7 +130,10 @@ export default function CampaignPage() {
     <main>
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="Olajide Igbalaye, home">OI<span>.</span></a>
-        <button className="menu-toggle" type="button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
+        <button className={menuOpen ? 'menu-toggle is-open' : 'menu-toggle'} type="button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
+          <span className="menu-icon" aria-hidden="true"><span /><span /><span /></span>
+          <span className="menu-toggle-label">{menuOpen ? 'CLOSE' : 'MENU'}</span>
+        </button>
         <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'} aria-label="Main navigation">
           <a href="#about" onClick={() => setMenuOpen(false)}>My story</a><a href="#work" onClick={() => setMenuOpen(false)}>Things I have made</a><a className="nav-cta" href="#conversation" onClick={() => { setMenuOpen(false); track('CTA clicked', 'navigation') }}>Let&apos;s talk <ArrowUpRight size={15} /></a>
         </nav>

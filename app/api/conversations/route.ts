@@ -89,10 +89,6 @@ export async function POST(request: Request) {
   if (typeof emailUpdatesConsent !== 'boolean') {
     return NextResponse.json({ error: 'Please check your email update preference.' }, { status: 400 })
   }
-  if (body.consent !== true) {
-    return NextResponse.json({ error: 'Please agree before saving your answers.' }, { status: 400 })
-  }
-
   const supabaseUrl = process.env.SUPABASE_URL
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -111,12 +107,22 @@ export async function POST(request: Request) {
       desired_outcome: desiredOutcome,
       previous_attempts: previousAttempts,
       willingness,
-      consent: true,
       email_updates_consent: emailUpdatesConsent,
     })
 
     if (error) {
-      console.error('Supabase could not save conversation answers:', error.message)
+      console.error('Supabase could not save conversation answers:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
+      if (['23502', '23514', '42501', '42703', 'PGRST204', 'PGRST205'].includes(error.code)) {
+        return NextResponse.json(
+          { error: 'Answer saving is not set up yet. You can still book a conversation directly.' },
+          { status: 503 },
+        )
+      }
       return NextResponse.json({ error: 'We could not save your answers. Please try again or book a conversation directly.' }, { status: 503 })
     }
   } catch (error) {

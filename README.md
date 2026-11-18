@@ -22,7 +22,7 @@ There is no pitch and no need to have everything figured out. The aim is to list
 
 ## What happens next
 
-You can choose a free 30-minute conversation in Calendly. The quick questions are optional. To submit answers, you need to provide an email and agree to save your answers so I can follow up about a conversation. Permission to receive related email updates is a separate, optional choice. Answers are saved only if the page confirms they were saved. If saving is unavailable, you can still book a time.
+You can choose a free 30-minute conversation in Calendly. The quick questions are optional. To submit answers, you need to provide an email. Permission to receive related email updates is a separate, optional choice. Answers are saved only if the page confirms they were saved. If saving is unavailable, you can still book a time.
 
 ## A little about my work
 

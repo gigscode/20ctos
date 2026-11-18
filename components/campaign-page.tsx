@@ -121,7 +121,6 @@ export default function CampaignPage() {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-  const [consent, setConsent] = useState(false)
   const [emailUpdatesConsent, setEmailUpdatesConsent] = useState(false)
   const [questionnaireOpen, setQuestionnaireOpen] = useState(true)
   const [savedNotice, setSavedNotice] = useState(false)
@@ -160,7 +159,7 @@ export default function CampaignPage() {
       const response = await fetch('/api/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, consent, emailUpdatesConsent }),
+        body: JSON.stringify({ ...form, emailUpdatesConsent }),
       })
 
       if (!response.ok) {
@@ -181,14 +180,12 @@ export default function CampaignPage() {
 
   function dismissQuestionnaire() {
     setForm(initialState)
-    setConsent(false)
     setEmailUpdatesConsent(false)
     setQuestionnaireOpen(false)
     setError('')
   }
 
   function openQuestionnaire() {
-    setConsent(false)
     setEmailUpdatesConsent(false)
     setStep(0)
     setQuestionnaireOpen(true)
@@ -207,9 +204,9 @@ export default function CampaignPage() {
           <div className="form-progress"><div><span>QUICK QUESTIONS</span><b>STEP {step + 1} OF 3</b></div><div className="progress-track"><span style={{ width: `${((step + 1) / 3) * 100}%` }} /></div></div>
           {step === 0 && <div className="form-step"><h2>Which best describes you?</h2><div className="category-options">{categories.map((item) => <button type="button" key={item.id} aria-pressed={form.category === item.id} className={form.category === item.id ? 'category-option is-selected' : 'category-option'} onClick={() => chooseCategory(item.id)}><span className="category-number">{item.number}</span><span className="category-copy"><strong>{item.title}</strong><small>{item.description}</small></span><span className="radio-dot" /></button>)}</div></div>}
           {step === 1 && form.category && <div className="form-step"><h2>What is the main thing you need help with?</h2><div className="quick-choice-grid">{challengeOptions[form.category].map((option) => <button type="button" key={option.value} aria-pressed={form.biggestChallenge === option.value} className={form.biggestChallenge === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('biggestChallenge', option.value)}>{option.label}</button>)}</div><h2 className="quick-subheading">What have you tried so far?</h2><div className="quick-choice-grid">{triedOptions.map((option) => <button type="button" key={option.value} aria-pressed={form.previousAttempts === option.value} className={form.previousAttempts === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('previousAttempts', option.value)}>{option.label}</button>)}</div></div>}
-          {step === 2 && <div className="form-step"><label className="questionnaire-email-field" htmlFor="conversation-email">Your email address <span>Required if you want me to follow up</span><input id="conversation-email" name="email" type="email" autoComplete="email" maxLength={254} required value={form.email} onChange={(event) => update('email', event.target.value)} /></label><h2>What would be most useful to you?</h2><div className="quick-choice-grid">{outcomeOptions.map((option) => <button type="button" key={option.value} aria-pressed={form.desiredOutcome === option.value} className={form.desiredOutcome === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('desiredOutcome', option.value)}>{option.label}</button>)}</div><h2 className="quick-subheading">Would you consider paid support if it felt right?</h2><div className="quick-choice-grid">{willingnessOptions.map((option) => <button type="button" key={option.value} aria-pressed={form.willingness === option.value} className={form.willingness === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('willingness', option.value)}>{option.label}</button>)}</div><label className="consent-field"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} required /><span>I agree to save my answers and email for research and to contact me about arranging a conversation. I understand the information will be kept for no more than 12 months.</span></label><label className="consent-field email-updates-consent"><input type="checkbox" checked={emailUpdatesConsent} onChange={(event) => setEmailUpdatesConsent(event.target.checked)} /><span>I also agree to receive email updates related to conversations and products.</span></label></div>}
+          {step === 2 && <div className="form-step"><label className="questionnaire-email-field" htmlFor="conversation-email">Your email address <span>Required if you want me to follow up</span><input id="conversation-email" name="email" type="email" autoComplete="email" maxLength={254} required value={form.email} onChange={(event) => update('email', event.target.value)} /></label><h2>What would be most useful to you?</h2><div className="quick-choice-grid">{outcomeOptions.map((option) => <button type="button" key={option.value} aria-pressed={form.desiredOutcome === option.value} className={form.desiredOutcome === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('desiredOutcome', option.value)}>{option.label}</button>)}</div><h2 className="quick-subheading">Would you consider paid support if it felt right?</h2><div className="quick-choice-grid">{willingnessOptions.map((option) => <button type="button" key={option.value} aria-pressed={form.willingness === option.value} className={form.willingness === option.value ? 'quick-choice is-selected' : 'quick-choice'} onClick={() => update('willingness', option.value)}>{option.label}</button>)}</div><label className="consent-field email-updates-consent"><input type="checkbox" checked={emailUpdatesConsent} onChange={(event) => setEmailUpdatesConsent(event.target.checked)} /><span>I agree to receive email updates related to conversations and products.</span></label></div>}
           {error && <p className="form-error" role="alert">{error}</p>}
-          <div className="form-actions"><button className="back-button" type="button" onClick={() => step === 0 ? dismissQuestionnaire() : setStep((current) => current - 1)}>{step === 0 ? 'Skip for now' : <><ArrowLeft size={16} /> Back</>}</button>{step < 2 ? <button className="button button-dark" type="button" disabled={(step === 0 && !form.category) || (step === 1 && (!form.biggestChallenge || !form.previousAttempts))} onClick={next}>Continue <ArrowRight size={16} /></button> : <button className="button button-dark" type="submit" disabled={saving || !isValidEmail(form.email) || !form.desiredOutcome || !form.willingness || !consent}>{saving ? 'Saving...' : 'Save and continue'} <ArrowRight size={16} /></button>}</div>
+          <div className="form-actions"><button className="back-button" type="button" onClick={() => step === 0 ? dismissQuestionnaire() : setStep((current) => current - 1)}>{step === 0 ? 'Skip for now' : <><ArrowLeft size={16} /> Back</>}</button>{step < 2 ? <button className="button button-dark" type="button" disabled={(step === 0 && !form.category) || (step === 1 && (!form.biggestChallenge || !form.previousAttempts))} onClick={next}>Continue <ArrowRight size={16} /></button> : <button className="button button-dark" type="submit" disabled={saving || !isValidEmail(form.email) || !form.desiredOutcome || !form.willingness}>{saving ? 'Saving...' : 'Save and continue'} <ArrowRight size={16} /></button>}</div>
         </form>
       </dialog>
 

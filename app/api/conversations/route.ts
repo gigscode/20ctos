@@ -65,6 +65,8 @@ export async function POST(request: Request) {
   const desiredOutcome = body.desiredOutcome
   const previousAttempts = body.previousAttempts
   const willingness = body.willingness
+  const email = body.email
+  const emailUpdatesConsent = body.emailUpdatesConsent
 
   if (!isCategory(category)) {
     return NextResponse.json({ error: 'Please choose the option that feels closest to your situation.' }, { status: 400 })
@@ -80,6 +82,12 @@ export async function POST(request: Request) {
   }
   if (typeof willingness !== 'string' || !willingnessOptions.includes(willingness)) {
     return NextResponse.json({ error: 'Please choose an answer about paid support.' }, { status: 400 })
+  }
+  if (typeof email !== 'string' || email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
+  }
+  if (typeof emailUpdatesConsent !== 'boolean') {
+    return NextResponse.json({ error: 'Please check your email update preference.' }, { status: 400 })
   }
   if (body.consent !== true) {
     return NextResponse.json({ error: 'Please agree before saving your answers.' }, { status: 400 })
@@ -98,11 +106,13 @@ export async function POST(request: Request) {
     })
     const { error } = await supabase.from('conversation_submissions').insert({
       category,
+      email: email.trim(),
       biggest_challenge: biggestChallenge,
       desired_outcome: desiredOutcome,
       previous_attempts: previousAttempts,
       willingness,
       consent: true,
+      email_updates_consent: emailUpdatesConsent,
     })
 
     if (error) {

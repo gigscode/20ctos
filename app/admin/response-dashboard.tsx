@@ -158,19 +158,8 @@ function BarList({ items, total }: { items: { label: string; count: number }[]; 
   )
 }
 
-function WeeklyTrend({ responses }: { responses: AdminResponse[] }) {
-  const now = new Date()
-  const start = new Date(now)
-  start.setUTCHours(0, 0, 0, 0)
-  start.setUTCDate(start.getUTCDate() - 6 * 7 - ((start.getUTCDay() + 6) % 7))
-  const counts = Array.from({ length: 7 }, () => 0)
-
-  for (const response of responses) {
-    const date = new Date(response.created_at)
-    const week = Math.floor((date.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000))
-    if (week >= 0 && week < counts.length) counts[week] += 1
-  }
-
+function WeeklyTrend({ weekCounts }: { weekCounts: number[] }) {
+  const counts = weekCounts
   const max = Math.max(1, ...counts)
   const points = counts.map((count, index) => `${22 + index * 43},${91 - (count / max) * 68}`).join(' ')
   const weeklyTotal = counts.reduce((sum, count) => sum + count, 0)
@@ -190,7 +179,7 @@ function WeeklyTrend({ responses }: { responses: AdminResponse[] }) {
   )
 }
 
-export default function AdminDashboard({ responses, error, filters }: { responses: AdminResponse[]; error: string; filters: Filters }) {
+export default function AdminDashboard({ responses, error, filters, weekCounts }: { responses: AdminResponse[]; error: string; filters: Filters; weekCounts: number[] }) {
   const router = useRouter()
   const [logoutError, setLogoutError] = useState('')
   const categorySummary = summarize(responses, 'category')
@@ -261,7 +250,7 @@ export default function AdminDashboard({ responses, error, filters }: { response
                   </article>
                   <article className="admin-panel admin-trend-panel">
                     <div className="admin-panel-heading"><div><p className="admin-eyebrow">02 / MOMENTUM</p><h2>When they arrived</h2></div><span className="admin-trend-mark"><ArrowUpRight size={17} /></span></div>
-                    <WeeklyTrend responses={responses} />
+                    <WeeklyTrend weekCounts={weekCounts} />
                     <p className="admin-panel-note">A rolling view of the last seven weeks, based on every saved response.</p>
                   </article>
                 </section>

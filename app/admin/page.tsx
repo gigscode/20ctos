@@ -77,12 +77,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const category = categories.find((item) => item === params.category)
   const from = validDate(params.from) ? params.from : undefined
   const to = validDate(params.to) ? params.to : undefined
-  const filters = {
-    category,
-    from,
-    to,
-  }
+  const filters = { category, from, to }
   const { responses, error } = await loadResponses(filters)
 
-  return <AdminDashboard responses={responses} error={error} filters={filters} />
+  // Compute weekly counts on the server so the client gets a stable snapshot
+  // and avoids a hydration mismatch from Date.now() differing between renders.
+  const now = new Date()
+  const weekStart = new Date(now)
+  weekStart.setUTCHours(0, 0, 0, 0)
+  weekStart.setUTCDate(weekStart.getUTCDate() - 6 * 7 - ((weekStart.getUTCDay() + 6) % 7))
+  const weekCounts = Array.from({ length: 7 }, () => 0)
+  for (const response of responses) {
+    const date = new Date(response.created_at)
+    const week = Math.floor((date.getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000))
+    if (week >= 0 && week < weekCounts.length) weekCounts[week] += 1
+  }
+
+  return <AdminDashboard responses={responses} error={error} filters={filters} weekCounts={weekCounts} />
 }

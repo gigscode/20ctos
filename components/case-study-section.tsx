@@ -42,7 +42,6 @@ export default function CaseStudySection() {
         <p>Business direction, offer packaging, pricing, website development, and initial marketing planning.</p>
         <a href="#conversation">Explore your next step <ArrowRight size={15} aria-hidden="true" /></a>
       </div>
-      <p className="case-study-disclosure">Client identity and identifying visuals are omitted. Add them only with the client&apos;s permission.</p>
     </section>
   )
 }

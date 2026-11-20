@@ -5,12 +5,22 @@ The site opens with a short, tap-based questionnaire. People can skip it and exp
 ## Connect a Supabase project
 
 1. Create a Supabase project.
-2. Apply all migrations in order. In the Supabase SQL Editor, run `migrations/20261118200000_create_conversation_submissions.sql`, `migrations/20261118214500_add_contact_email.sql`, `migrations/20261118220000_remove_required_submission_consent.sql`, and `migrations/20261118230000_prevent_duplicate_email_submissions.sql`. The latest migration also brings older databases up to date with the current consent handling and prevents duplicate email submissions. Or, authenticate with `pnpm exec supabase login`, then run `pnpm exec supabase link --project-ref YOUR_PROJECT_REF` and `pnpm exec supabase db push`. The CLI may ask for your database password in the terminal.
+2. Apply all migrations in order. In the Supabase SQL Editor, run the files in `migrations/` in order. Or, authenticate with `pnpm exec supabase login`, then run `pnpm exec supabase link --project-ref YOUR_PROJECT_REF` and `pnpm exec supabase db push`. The CLI may ask for your database password in the terminal.
 3. Copy `.env.example` to `.env.local` in the project root.
 4. In the Supabase project settings, copy the project URL and anon key into `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `.env.local`.
 5. Restart the Next.js development server.
 
 Keep `.env.local` on your computer and out of source control. The site uses the anon key only in its server route. Row-level security lets visitors add a validated answer but does not let the public site read saved answers. Review submissions in the Supabase Table Editor while signed in to your project.
+
+## Keep a free project active
+
+The GitHub Actions workflow in `.github/workflows/supabase-keepalive.yml` calls a small database function once a day. It does not read or change submissions. To enable it:
+
+1. Apply all Supabase migrations, including `20261120140000_add_keepalive_function.sql`.
+2. In the GitHub repository settings, add Actions secrets named `SUPABASE_URL` and `SUPABASE_ANON_KEY` using the matching values from your Supabase project.
+3. In the repository's Actions tab, enable workflows if prompted. You can run **Keep Supabase active** manually to check the setup.
+
+GitHub's scheduled runs can be delayed or disabled, so this is not a guarantee against Supabase pausing an inactive free project. Check the workflow run history occasionally.
 
 ## Review answers
 
